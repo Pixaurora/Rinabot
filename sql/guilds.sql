@@ -1,5 +1,9 @@
 CREATE TABLE guilds(
-    guild_id bigint PRIMARY KEY,
-    logging_enabled bool DEFAULT false,
-    logging_channel bigint
-)
+    id bigint PRIMARY KEY,
+    name text
+);
+
+CREATE TABLE guild_prefixes(
+    guild_id bigint PRIMARY KEY references guilds(id),
+    prefixes text[] DEFAULT '{}'
+);

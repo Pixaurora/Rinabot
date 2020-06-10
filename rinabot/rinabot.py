@@ -30,7 +30,7 @@ class RinaBot(commands.Bot):
 
         self.config = config
 
-        extensions = ['jishaku']
+        extensions = ['jishaku', 'rinabot.cogs.prefix'] 
 
         for cog in extensions:
             self.load_extension(cog)
