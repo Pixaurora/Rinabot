@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Mousey: Discord Moderation Bot
+Rina Bot: Discord Bot for Something Probably
 Copyright (c) 2016 - 2020 Lilly Rose Berner
+Copyright (C) 2020 Rina
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

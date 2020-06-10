@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Mousey: Discord Moderation Bot
+Rina Bot: Discord Bot for Something Probably
 Copyright (c) 2016 - 2020 Lilly Rose Berner
+Copyright (C) 2020 Rina
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -18,11 +19,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-__all__ = ('remove_accents',)
+__all__ = ("remove_accents",)
 
 
 def remove_accents(text):
     """Replace grave accents (`) with similar ones to not break code blocks."""
 
     # Always cast to string so we don't have to deal with this elsewhere
-    return str(text).replace('\N{GRAVE ACCENT}', '\N{MODIFIER LETTER GRAVE ACCENT}')
+    return str(text).replace("\N{GRAVE ACCENT}", "\N{MODIFIER LETTER GRAVE ACCENT}")

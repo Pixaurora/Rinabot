@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Mousey: Discord Moderation Bot
+Rina Bot: Discord Bot for Something Probably
 Copyright (c) 2016 - 2020 Lilly Rose Berner
+Copyright (C) 2020 Rina
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +26,6 @@ from discord.ext import commands
 
 from .handler import get_message
 
-
 log = logging.getLogger(__name__)
 
 
@@ -38,7 +38,7 @@ class Errors(commands.Cog):
         self.bot.on_error = commands.Bot.on_error
 
     async def on_error(self, event, *args, **kwargs):
-        log.exception(f'Unhandled exception in {event} handler.')
+        log.exception(f"Unhandled exception in {event} handler.")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
