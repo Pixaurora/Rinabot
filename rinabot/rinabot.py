@@ -22,10 +22,24 @@ import asyncpg
 import ruamel.yaml
 from discord.ext import commands
 
+async def get_prefix(bot, message):
+    default_prefix = [f'<@{bot.user.id}>', f'<@!{bot.user.id}>']
+    if not message.guild:
+        return default_prefix
+    prefixes = await bot.pool.fetchval("""
+    SELECT prefixes
+        FROM guild_prefixes
+        WHERE guild_id = $1
+    """, message.guild.id)
+
+    if prefixes == None:
+        return default_prefix
+    else:
+        return default_prefix + prefixes
 
 class RinaBot(commands.Bot):
     def __init__(self, config):
-        super().__init__(command_prefix=commands.when_mentioned, case_insensitive=True)
+        super().__init__(command_prefix=get_prefix, case_insensitive=True)
 
         self.config = config
 
@@ -53,6 +67,47 @@ class RinaBot(commands.Bot):
         logger.addHandler(handler)
 
         super().run(self.config["bot"]["token"])
+
+    async def on_message(self, message):
+        if message.author.bot or not message.guild:
+            return
+
+        return await super().on_message(message)
+
+    async def handle_guild(self, guild):
+        entry = await self.pool.fetchrow("""
+        SELECT *
+            FROM guilds
+            WHERE id = $1
+        """, guild.id)
+
+        if entry == None:
+            await self.pool.execute("""
+            INSERT INTO guilds (id, name, icon_hash)
+                VALUES ($1, $2, $3)
+            """, guild.id, guild.name, guild.icon)
+        else:
+            if entry['icon_hash'] != guild.icon:
+                await self.pool.execute("""
+                UPDATE guilds
+                    SET icon_hash = $1
+                    WHERE id = $2
+                """, guild.icon, guild.id)
+            if entry['name'] != guild.name:
+                await self.pool.execute("""
+                UPDATE guilds
+                    SET name = $1
+                    WHERE id = $2
+                """, guild.name, guild.id)
+
+
+    async def on_guild_avaliable(self, guild):
+        await self.handle_guild(guild)
+
+    async def on_ready(self):
+        for guild in self.guilds:
+            await self.handle_guild(guild)
+
 
     async def start(self, *args, **kwargs):
         self.pool = await asyncpg.create_pool(**self.config["postgres"])

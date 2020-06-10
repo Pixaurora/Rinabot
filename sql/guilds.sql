@@ -1,6 +1,7 @@
 CREATE TABLE guilds(
     id bigint PRIMARY KEY,
-    name text
+    name text,
+    icon_hash text
 );
 
 CREATE TABLE guild_prefixes(
