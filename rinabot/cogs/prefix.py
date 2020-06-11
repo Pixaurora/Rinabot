@@ -37,7 +37,7 @@ class Prefix(commands.Cog):
 
         await ctx.send(f'Prefix{["",  "es"][len(prefixes) > 1]}: {",".join(prefixes)}' + [
             '',
-            f'\n```Prefix Subcommands:\n{clean_prefix(self.bot, ctx.prefix)}prefix add [prefix]\n{clean_prefix(self.bot, ctx.prefix)}prefix remove [prefix]```!'
+            f'\n```Prefix Subcommands:\n{clean_prefix(self.bot, ctx.prefix)}prefix add [prefix]\n{clean_prefix(self.bot, ctx.prefix)}prefix remove [prefix]```'
         ][ctx.author.guild_permissions.administrator])
 
     @prefix.command()

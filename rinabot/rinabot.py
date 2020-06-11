@@ -23,7 +23,7 @@ import ruamel.yaml
 from discord.ext import commands
 
 async def get_prefix(bot, message):
-    default_prefix = [f'<@{bot.user.id}>', f'<@!{bot.user.id}>']
+    default_prefix = [f'<@{bot.user.id}> ', f'<@!{bot.user.id}> ']
     if not message.guild:
         return default_prefix
     prefixes = await bot.pool.fetchval("""
