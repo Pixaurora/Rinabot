@@ -4,14 +4,15 @@ import re
 
 import random
 
-DICE_REGEX = re.compile(r'^(\d+)d(\d+)$')
+DICE_REGEX = re.compile(r"^(\d+)d(\d+)$")
+
 
 class Die:
-    __slots__ = ('amount', 'faces', 'name')
+    __slots__ = ("amount", "faces", "name")
 
-    def __init__(self, amount:int, faces:int):
+    def __init__(self, amount: int, faces: int):
         if amount <= 0 or faces <= 0:
-            raise ValueError('Incorrect format.')
+            raise ValueError("Incorrect format.")
 
         self.amount = amount
         self.faces = faces
@@ -20,46 +21,54 @@ class Die:
         return [random.randint(1, self.faces) for i in range(self.amount)]
 
     def __str__(self):
-        return f'{self.amount}d{self.faces}'
+        return f"{self.amount}d{self.faces}"
 
     @classmethod
     def from_string(cls, string):
         try:
             return cls(*[int(i) for i in DICE_REGEX.findall(string)[0]])
         except IndexError:
-            raise KeyError('Incorrect format.')
+            raise KeyError("Incorrect format.")
+
 
 class RNG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def send_roll(self, ctx, dice_ob:Die, repeat:int=1):
+    async def send_roll(self, ctx, dice_ob: Die, repeat: int = 1):
         rolls = [dice_ob() for i in range(repeat)]
 
         name = str(dice_ob)
 
-        message = 'Rolling {}'.format(name) + ' {} times' \
-                                              ''.format(repeat)
+        message = "Rolling {}".format(name) + " {} times" "".format(repeat)
 
-        appendage = '\n'.join(['Individually: ({}); Sum: ({})'.format(', '.join([str(i) for i in roll]), sum(roll)) for roll in rolls])
+        appendage = "\n".join(
+            [
+                "Individually: ({}); Sum: ({})".format(
+                    ", ".join([str(i) for i in roll]), sum(roll)
+                )
+                for roll in rolls
+            ]
+        )
 
-        await ctx.send(message+'\n'+appendage)
+        await ctx.send(message + "\n" + appendage)
 
     async def get_dice(self, ctx, name):
         try:
             return Die.from_string(name)
         except KeyError:
-            await ctx.send('Incorrect format. Correct format is XdX.')
+            await ctx.send("Incorrect format. Correct format is XdX.")
         except ValueError:
-            await ctx.send('Incorrect format. Make sure all numbers are above 0.')
+            await ctx.send("Incorrect format. Make sure all numbers are above 0.")
 
     async def bad_repeat(self, ctx, repeat):
         if repeat == 0:
             return await ctx.send("You can't roll 0 times.")
         elif repeat <= 0:
             return await ctx.send("You can't doll negative times.")
-    @commands.group(name="roll",brief="Rolls a dice", invoke_without_command=True)
-    async def roll(self, ctx, *, dice_name: str=None, repeat:int=1):
+
+    @commands.group(name="roll", brief="Rolls a dice", invoke_without_command=True)
+    async def roll(self, ctx, *, dice_name: str = None, repeat: int = 1):
         """Rolls a Dice
 
         Use the command to see a guide.
@@ -78,7 +87,7 @@ class RNG(commands.Cog):
         else:
 
             await ctx.send(
-'''**Dice Guide**
+                """**Dice Guide**
 Basic Info
 > *Syntax:* >roll (dice name) (amount of rolls)
 > An amount of rolls is optional and will default to 1.
@@ -88,12 +97,13 @@ Basic Info
 > ** **
 **Custom die**
 > To make custom die, simply use this format: (amount)d(sides)
-> Amount just means how many die to use, and sides is the max number you can roll'''
+> Amount just means how many die to use, and sides is the max number you can roll"""
             )
 
     @commands.command()
-    async def ord(self, ctx, *, message:str):
-        await ctx.send(','.join(str(ord(i)) for i in message))
+    async def ord(self, ctx, *, message: str):
+        await ctx.send(",".join(str(ord(i)) for i in message))
+
 
 def setup(client):
     client.add_cog(RNG(client))

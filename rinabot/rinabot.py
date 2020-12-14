@@ -23,20 +23,25 @@ import ruamel.yaml
 from discord import Intents
 from discord.ext import commands
 
+
 async def get_prefix(bot, message):
-    default_prefix = [f'<@{bot.user.id}> ', f'<@!{bot.user.id}> ']
+    default_prefix = [f"<@{bot.user.id}> ", f"<@!{bot.user.id}> "]
     if not message.guild:
         return default_prefix
-    prefixes = await bot.pool.fetchval("""
+    prefixes = await bot.pool.fetchval(
+        """
     SELECT prefixes
         FROM guild_prefixes
         WHERE guild_id = $1
-    """, message.guild.id)
+    """,
+        message.guild.id,
+    )
 
     if prefixes == None:
         return default_prefix
     else:
         return default_prefix + prefixes
+
 
 class RinaBot(commands.Bot):
     def __init__(self, config):
@@ -46,14 +51,22 @@ class RinaBot(commands.Bot):
             members=True,
             presences=True,
             messages=True,
-            guild_reactions=True
+            guild_reactions=True,
         )
 
-        super().__init__(command_prefix=get_prefix, case_insensitive=True, intents=intents)
+        super().__init__(
+            command_prefix=get_prefix, case_insensitive=True, intents=intents
+        )
 
         self.config = config
 
-        extensions = ["jishaku", "rinabot.cogs.prefix", "rinabot.cogs.errors", "rinabot.cogs.rng", "rinabot.cogs.log"]
+        extensions = [
+            "jishaku",
+            "rinabot.cogs.prefix",
+            "rinabot.cogs.errors",
+            "rinabot.cogs.rng",
+            "rinabot.cogs.log",
+        ]
 
         for cog in extensions:
             self.load_extension(cog)
@@ -85,12 +98,15 @@ class RinaBot(commands.Bot):
         return await super().on_message(message)
 
     async def handle_guild(self, guild):
-        await self.pool.execute("""
+        await self.pool.execute(
+            """
             INSERT INTO guilds (id)
                 VALUES ($1)
             ON CONFLICT (id)
             DO NOTHING;
-        """, guild.id)
+        """,
+            guild.id,
+        )
 
     async def on_guild_available(self, guild):
         await self.handle_guild(guild)

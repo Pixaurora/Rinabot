@@ -20,13 +20,21 @@ from discord.ext import commands
 
 from .errors.utils import clean_prefix
 
+
 class Prefix(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def get_pretty_prefixes(self, message):
-        prefixes = [clean_prefix(self.bot, prefix) for prefix in await self.bot.command_prefix(self.bot, message)]
-        return [f'`{i.lstrip().rstrip()}`' for n, i in enumerate(prefixes) if i not in prefixes[:n]]
+        prefixes = [
+            clean_prefix(self.bot, prefix)
+            for prefix in await self.bot.command_prefix(self.bot, message)
+        ]
+        return [
+            f"`{i.lstrip().rstrip()}`"
+            for n, i in enumerate(prefixes)
+            if i not in prefixes[:n]
+        ]
 
     @commands.group()
     async def prefix(self, ctx):
@@ -35,64 +43,90 @@ class Prefix(commands.Cog):
 
         prefixes = await self.get_pretty_prefixes(ctx.message)
 
-        await ctx.send(f'Prefix{["",  "es"][len(prefixes) > 1]}: {",".join(prefixes)}' + [
-            '',
-            f'\n```Prefix Subcommands:\n{clean_prefix(self.bot, ctx.prefix)}prefix add [prefix]\n{clean_prefix(self.bot, ctx.prefix)}prefix remove [prefix]```'
-        ][ctx.author.guild_permissions.administrator])
+        await ctx.send(
+            f'Prefix{["",  "es"][len(prefixes) > 1]}: {",".join(prefixes)}'
+            + [
+                "",
+                f"\n```Prefix Subcommands:\n{clean_prefix(self.bot, ctx.prefix)}prefix add [prefix]\n{clean_prefix(self.bot, ctx.prefix)}prefix remove [prefix]```",
+            ][ctx.author.guild_permissions.administrator]
+        )
 
     @prefix.command()
     @commands.has_guild_permissions(administrator=True)
-    async def add(self, ctx, *, prefix:str):
-        if clean_prefix(self.bot, prefix) in await self.get_pretty_prefixes(ctx.message):
-            await ctx.send('This prefix has already been added!')
+    async def add(self, ctx, *, prefix: str):
+        if clean_prefix(self.bot, prefix) in await self.get_pretty_prefixes(
+            ctx.message
+        ):
+            await ctx.send("This prefix has already been added!")
         else:
-            prefixes = await self.bot.pool.fetchval("""
+            prefixes = await self.bot.pool.fetchval(
+                """
             SELECT prefixes
                 FROM guild_prefixes
                 WHERE guild_id = $1
-            """, ctx.guild.id)
+            """,
+                ctx.guild.id,
+            )
             if prefixes == None:
-                await self.bot.pool.execute("""
+                await self.bot.pool.execute(
+                    """
                 INSERT INTO guild_prefixes (guild_id, prefixes)
                     VALUES ($1, $2)
-                """, ctx.guild.id, [prefix])
+                """,
+                    ctx.guild.id,
+                    [prefix],
+                )
             else:
                 prefixes.append(prefix)
-                await self.bot.pool.execute("""
+                await self.bot.pool.execute(
+                    """
                 UPDATE guild_prefixes
                     SET prefixes = $1
                     WHERE guild_id = $2
-                """, prefixes, ctx.guild.id)
-            await ctx.send(f"Done! Added `{clean_prefix(self.bot, prefix)}` to this server's prefix list!")
+                """,
+                    prefixes,
+                    ctx.guild.id,
+                )
+            await ctx.send(
+                f"Done! Added `{clean_prefix(self.bot, prefix)}` to this server's prefix list!"
+            )
 
     @prefix.command()
     @commands.has_guild_permissions(administrator=True)
-    async def remove(self, ctx, *, prefix:str):
-        prefixes = await self.bot.pool.fetchval("""
+    async def remove(self, ctx, *, prefix: str):
+        prefixes = await self.bot.pool.fetchval(
+            """
         SELECT prefixes
             FROM guild_prefixes
             WHERE guild_id = $1
-        """, ctx.guild.id)
+        """,
+            ctx.guild.id,
+        )
 
         if prefixes == None:
-            await ctx.send('This guild has no custom prefixes!')
-        elif clean_prefix(self.bot, prefix) == clean_prefix(self.bot, self.bot.user.mention):
+            await ctx.send("This guild has no custom prefixes!")
+        elif clean_prefix(self.bot, prefix) == clean_prefix(
+            self.bot, self.bot.user.mention
+        ):
             await ctx.send(f"You can't remove mentioning me as a prefix!")
         elif not prefix in prefixes:
-            await ctx.send(f"This guild doesn't have the prefix `{clean_prefix(self,prefix)}` in the list!")
+            await ctx.send(
+                f"This guild doesn't have the prefix `{clean_prefix(self,prefix)}` in the list!"
+            )
         else:
             prefixes.remove(prefix)
-            await self.bot.pool.execute("""
+            await self.bot.pool.execute(
+                """
             UPDATE guild_prefixes
                 SET prefixes = $1
                 WHERE guild_id = $2
-            """, prefixes, ctx.guild.id)
-            await ctx.send(f'The prefix `{clean_prefix(self.bot, prefix)}` has been successfully removed!')
-
-
-
-
-
+            """,
+                prefixes,
+                ctx.guild.id,
+            )
+            await ctx.send(
+                f"The prefix `{clean_prefix(self.bot, prefix)}` has been successfully removed!"
+            )
 
 
 def setup(bot):
