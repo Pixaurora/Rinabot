@@ -6,7 +6,7 @@ import random
 
 DICE_REGEX = re.compile(r'^(\d+)d(\d+)$')
 
-class DiceObject:
+class Die:
     __slots__ = ('amount', 'faces', 'name')
 
     def __init__(self, amount:int, faces:int):
@@ -33,7 +33,7 @@ class RNG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def send_roll(self, ctx, dice_ob:DiceObject, repeat:int=1):
+    async def send_roll(self, ctx, dice_ob:Die, repeat:int=1):
         rolls = [dice_ob() for i in range(repeat)]
 
         name = str(dice_ob)
@@ -47,7 +47,7 @@ class RNG(commands.Cog):
 
     async def get_dice(self, ctx, name):
         try:
-            return DiceObject.from_string(name)
+            return Die.from_string(name)
         except KeyError:
             await ctx.send('Incorrect format. Correct format is XdX.')
         except ValueError:
