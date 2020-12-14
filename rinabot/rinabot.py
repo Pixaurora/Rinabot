@@ -53,7 +53,7 @@ class RinaBot(commands.Bot):
 
         self.config = config
 
-        extensions = ["jishaku", "rinabot.cogs.prefix", "rinabot.cogs.errors", "rinabot.cogs.rng"]
+        extensions = ["jishaku", "rinabot.cogs.prefix", "rinabot.cogs.errors", "rinabot.cogs.rng", "rinabot.cogs.log"]
 
         for cog in extensions:
             self.load_extension(cog)
@@ -91,7 +91,6 @@ class RinaBot(commands.Bot):
             ON CONFLICT (id)
             DO NOTHING;
         """, guild.id)
-
 
     async def on_guild_available(self, guild):
         await self.handle_guild(guild)
