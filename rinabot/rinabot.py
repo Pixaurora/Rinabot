@@ -85,17 +85,12 @@ class RinaBot(commands.Bot):
         return await super().on_message(message)
 
     async def handle_guild(self, guild):
-        entry = await self.pool.fetchrow("""
-        SELECT *
-            FROM guilds
-            WHERE id = $1
-        """, guild.id)
-
-        if entry == None:
-            await self.pool.execute("""
+        await self.pool.execute("""
             INSERT INTO guilds (id)
                 VALUES ($1)
-            """, guild.id)
+            ON CONFLICT (id)
+            DO NOTHING;
+        """, guild.id)
 
 
     async def on_guild_available(self, guild):
