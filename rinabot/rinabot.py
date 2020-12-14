@@ -108,7 +108,7 @@ class RinaBot(commands.Bot):
                 """, guild.name, guild.id)
 
 
-    async def on_guild_avaliable(self, guild):
+    async def on_guild_available(self, guild):
         await self.handle_guild(guild)
 
     async def on_ready(self):
