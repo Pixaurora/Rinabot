@@ -20,6 +20,7 @@ import logging
 
 import asyncpg
 import ruamel.yaml
+from discord import Intents
 from discord.ext import commands
 
 async def get_prefix(bot, message):
@@ -39,7 +40,13 @@ async def get_prefix(bot, message):
 
 class RinaBot(commands.Bot):
     def __init__(self, config):
-        super().__init__(command_prefix=get_prefix, case_insensitive=True)
+
+        intents = Intents.default()
+
+        intents.members = True
+        intents.presences = True
+
+        super().__init__(command_prefix=get_prefix, case_insensitive=True, intents=intents)
 
         self.config = config
 
