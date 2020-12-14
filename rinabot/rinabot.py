@@ -111,11 +111,6 @@ class RinaBot(commands.Bot):
     async def on_guild_available(self, guild):
         await self.handle_guild(guild)
 
-    async def on_ready(self):
-        for guild in self.guilds:
-            await self.handle_guild(guild)
-
-
     async def start(self, *args, **kwargs):
         self.pool = await asyncpg.create_pool(**self.config["postgres"])
 
