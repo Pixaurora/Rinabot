@@ -93,22 +93,9 @@ class RinaBot(commands.Bot):
 
         if entry == None:
             await self.pool.execute("""
-            INSERT INTO guilds (id, name, icon_hash)
-                VALUES ($1, $2, $3)
-            """, guild.id, guild.name, guild.icon)
-        else:
-            if entry['icon_hash'] != guild.icon:
-                await self.pool.execute("""
-                UPDATE guilds
-                    SET icon_hash = $1
-                    WHERE id = $2
-                """, guild.icon, guild.id)
-            if entry['name'] != guild.name:
-                await self.pool.execute("""
-                UPDATE guilds
-                    SET name = $1
-                    WHERE id = $2
-                """, guild.name, guild.id)
+            INSERT INTO guilds (id)
+                VALUES ($1)
+            """, guild.id)
 
 
     async def on_guild_available(self, guild):
