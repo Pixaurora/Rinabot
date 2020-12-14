@@ -41,10 +41,10 @@ async def get_prefix(bot, message):
 class RinaBot(commands.Bot):
     def __init__(self, config):
 
-        intents = Intents.default()
+        intents = Intents.all()
 
-        intents.members = True
-        intents.presences = True
+        intents.typing = False
+        intents.voice_states = False
 
         super().__init__(command_prefix=get_prefix, case_insensitive=True, intents=intents)
 
