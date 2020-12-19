@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import logging
 
 import asyncpg
+from asyncpg.exceptions import CannotConnectNowError
 import ruamel.yaml
 from discord import Intents
 from discord.ext import commands
@@ -30,10 +31,10 @@ async def get_prefix(bot, message):
         return default_prefix
     prefixes = await bot.pool.fetchval(
         """
-    SELECT prefixes
-        FROM guild_prefixes
-        WHERE guild_id = $1
-    """,
+        SELECT prefixes
+            FROM guild_prefixes
+            WHERE guild_id = $1
+        """,
         message.guild.id,
     )
 
@@ -112,6 +113,12 @@ class RinaBot(commands.Bot):
         await self.handle_guild(guild)
 
     async def start(self, *args, **kwargs):
-        self.pool = await asyncpg.create_pool(**self.config["postgres"])
+        self.pool = None
+
+        while not self.pool:
+            try:
+                self.pool = await asyncpg.create_pool(**self.config["postgres"])
+            except CannotConnectNowError:
+                pass
 
         await super().start(*args, **kwargs)
