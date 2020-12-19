@@ -63,10 +63,10 @@ class RinaBot(commands.Bot):
 
         extensions = [
             "jishaku",
-            "src.rinabot.cogs.prefix",
-            "src.rinabot.cogs.errors",
-            "src.rinabot.cogs.rng",
-            "src.rinabot.cogs.log",
+            "cogs.prefix",
+            "cogs.errors",
+            "cogs.rng",
+            "cogs.log",
         ]
 
         for cog in extensions:
