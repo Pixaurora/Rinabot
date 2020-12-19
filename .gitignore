@@ -9,6 +9,9 @@ config.yaml
 .idea/
 .vscode/
 
+## Docker
+
+postgres/
 
 ## Python - from https://github.com/github/gitignore
 

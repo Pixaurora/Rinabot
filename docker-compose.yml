@@ -1,0 +1,21 @@
+version: "3"
+networks:
+  rina-bot:
+
+services:
+  db:
+    image: "postgres"
+    restart: "always"
+    networks:
+      rina-bot:
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+  bot:
+    networks:
+      rina-bot:
+    depends_on:
+      - db
+    build: .

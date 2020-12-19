@@ -1,8 +1,8 @@
-CREATE TABLE guilds(
+CREATE TABLE IF NOT EXISTS guilds(
     id bigint PRIMARY KEY
 );
 
-CREATE TABLE guild_prefixes(
+CREATE TABLE IF NOT EXISTS guild_prefixes(
     guild_id bigint PRIMARY KEY references guilds(id),
     prefixes text[] DEFAULT '{}'
 );
