@@ -1,6 +1,7 @@
 FROM python:3
-WORKDIR /src/
+WORKDIR /
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
-COPY . .
+COPY run.py .
+COPY config.yaml .
 CMD ["python", "run.py"]

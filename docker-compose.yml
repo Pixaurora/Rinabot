@@ -14,6 +14,8 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
   bot:
+    volumes:
+      - ./src:/src
     networks:
       rina-bot:
     depends_on:

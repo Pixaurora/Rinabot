@@ -100,9 +100,6 @@ Basic Info
 > Amount just means how many die to use, and sides is the max number you can roll"""
             )
 
-    @commands.command()
-    async def ord(self, ctx, *, message: str):
-        await ctx.send(",".join(str(ord(i)) for i in message))
 
 
 def setup(client):
