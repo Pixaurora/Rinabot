@@ -43,7 +43,7 @@ class Log(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_guild_leave(self, guild):
+    async def on_guild_remove(self, guild):
         channel = self.bot.get_guild(self.bot.config["bot"]["guild_id"]).get_channel(
             self.bot.config["bot"]["join_channel_id"]
         )
