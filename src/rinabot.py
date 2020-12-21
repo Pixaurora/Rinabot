@@ -20,8 +20,7 @@ import asyncio
 import logging
 
 import asyncpg
-from asyncpg.exceptions import CannotConnectNowError
-from discord import Intents
+import discord
 from discord.ext import commands
 
 from .config import TOKEN
@@ -47,8 +46,7 @@ async def get_prefix(bot, message):
 
 class RinaBot(commands.Bot):
     def __init__(self):
-
-        intents = Intents(
+        intents = discord.Intents(
             guilds=True,
             members=True,
             presences=True,
@@ -111,7 +109,7 @@ class RinaBot(commands.Bot):
         while not self.pool:
             try:
                 self.pool = await asyncpg.create_pool(user="postgres", host="db")
-            except CannotConnectNowError:
+            except asyncpg.exceptions.CannotConnectNowError:
                 await asyncio.sleep(1)
 
         await super().start(*args, **kwargs)
