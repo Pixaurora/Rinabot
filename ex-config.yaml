@@ -1,9 +1,0 @@
-bot:
-  token: [bot token here]
-  guild_id: [bot's guild id]
-  join_channel_id: [bot's join channel id]
-  join_emoji: "join emoji"
-  leave_emoji: "leave emoji"
-
-postgres:
-  [postgres auth arguments here]

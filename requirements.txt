@@ -2,4 +2,3 @@ aiohttp
 asyncpg
 discord.py @ git+https://github.com/Rapptz/discord.py@master
 jishaku
-ruamel.yaml

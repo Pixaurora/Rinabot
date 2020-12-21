@@ -16,14 +16,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import asyncio
 import logging
 
 import asyncpg
 from asyncpg.exceptions import CannotConnectNowError
-import ruamel.yaml
 from discord import Intents
 from discord.ext import commands
 
+from .config import TOKEN
 
 async def get_prefix(bot, message):
     default_prefix = [f"<@{bot.user.id}> ", f"<@!{bot.user.id}> "]
@@ -45,7 +46,7 @@ async def get_prefix(bot, message):
 
 
 class RinaBot(commands.Bot):
-    def __init__(self, config):
+    def __init__(self):
 
         intents = Intents(
             guilds=True,
@@ -59,24 +60,16 @@ class RinaBot(commands.Bot):
             command_prefix=get_prefix, case_insensitive=True, intents=intents
         )
 
-        self.config = config
-
         extensions = [
             "jishaku",
-            "cogs.prefix",
-            "cogs.errors",
-            "cogs.rng",
-            "cogs.log",
+            "src.cogs.prefix",
+            "src.cogs.errors",
+            "src.cogs.rng",
+            "src.cogs.log",
         ]
 
         for cog in extensions:
             self.load_extension(cog)
-
-    @classmethod
-    def with_config(cls):
-        with open("config.yaml", encoding="utf-8") as f:
-            data = ruamel.yaml.safe_load(f)
-        return cls(data)
 
     def run(self):
         logger = logging.getLogger("discord")
@@ -90,7 +83,7 @@ class RinaBot(commands.Bot):
         )
         logger.addHandler(handler)
 
-        super().run(self.config["bot"]["token"])
+        super().run(TOKEN)
 
     async def on_message(self, message):
         if message.author.bot or not message.guild:
@@ -117,8 +110,8 @@ class RinaBot(commands.Bot):
 
         while not self.pool:
             try:
-                self.pool = await asyncpg.create_pool(**self.config["postgres"])
+                self.pool = await asyncpg.create_pool(user="postgres", host="db")
             except CannotConnectNowError:
-                pass
+                await asyncio.sleep(1)
 
         await super().start(*args, **kwargs)

@@ -18,37 +18,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from discord.ext import commands
 
-from .errors.utils import clean_prefix
+from ..config import GUILD_ID
+from ..config import JOIN_CHANNEL_ID
+from ..config import JOIN_EMOJI
+from ..config import LEAVE_EMOJI
 
 
 class Log(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.join_emoji = self.bot.config["bot"]["join_emoji"]
-        self.leave_emoji = self.bot.config["bot"]["leave_emoji"]
-
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        channel = self.bot.get_guild(self.bot.config["bot"]["guild_id"]).get_channel(
-            self.bot.config["bot"]["join_channel_id"]
-        )
+        channel = self.bot.get_guild(GUILD_ID).get_channel(JOIN_CHANNEL_ID)
 
         bots = sum(member.bot for member in guild.members)
-
         humans = len(guild.members) - bots
 
         await channel.send(
-            f"{self.join_emoji} Joined {guild.name} ({guild.id}) - {humans} humans - {bots} bots"
+            f"{JOIN_EMOJI} Joined {guild.name} ({guild.id}) - {humans} humans - {bots} bots"
         )
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        channel = self.bot.get_guild(self.bot.config["bot"]["guild_id"]).get_channel(
-            self.bot.config["bot"]["join_channel_id"]
-        )
+        channel = self.bot.get_guild(GUILD_ID).get_channel(JOIN_CHANNEL_ID)
 
-        await channel.send(f"{self.leave_emoji} Left {guild.name} ({guild.id})")
+        await channel.send(f"{LEAVE_EMOJI} Left {guild.name} ({guild.id})")
 
 
 def setup(bot):
