@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import asyncio
 import logging
 
+import aiohttp
 import asyncpg
 import discord
 from discord.ext import commands
@@ -118,4 +119,5 @@ class RinaBot(commands.Bot):
             except asyncpg.exceptions.CannotConnectNowError:
                 await asyncio.sleep(1)
 
-        await super().start(*args, **kwargs)
+        async with aiohttp.ClientSession(loop=self.loop, headers={'User-Agent': 'Rina Bot/0.1a (+https://github.com/araRina/Rina-Bot)'}) as self.session:
+            await super().start(*args, **kwargs)
