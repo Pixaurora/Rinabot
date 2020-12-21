@@ -97,8 +97,8 @@ class RinaBot(commands.Bot):
             INSERT INTO guilds (id)
                 VALUES ($1)
             ON CONFLICT (id)
-            DO NOTHING;
-        """,
+                DO NOTHING;
+            """,
             guild.id,
         )
 

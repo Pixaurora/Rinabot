@@ -61,18 +61,18 @@ class Prefix(commands.Cog):
         else:
             prefixes = await self.bot.pool.fetchval(
                 """
-            SELECT prefixes
-                FROM guild_prefixes
-                WHERE guild_id = $1
-            """,
+                SELECT prefixes
+                    FROM guild_prefixes
+                    WHERE guild_id = $1
+                """,
                 ctx.guild.id,
             )
             if prefixes == None:
                 await self.bot.pool.execute(
                     """
-                INSERT INTO guild_prefixes (guild_id, prefixes)
-                    VALUES ($1, $2)
-                """,
+                    INSERT INTO guild_prefixes (guild_id, prefixes)
+                        VALUES ($1, $2)
+                    """,
                     ctx.guild.id,
                     [prefix],
                 )
@@ -80,10 +80,10 @@ class Prefix(commands.Cog):
                 prefixes.append(prefix)
                 await self.bot.pool.execute(
                     """
-                UPDATE guild_prefixes
-                    SET prefixes = $1
-                    WHERE guild_id = $2
-                """,
+                    UPDATE guild_prefixes
+                        SET prefixes = $1
+                        WHERE guild_id = $2
+                    """,
                     prefixes,
                     ctx.guild.id,
                 )
@@ -96,10 +96,10 @@ class Prefix(commands.Cog):
     async def remove(self, ctx, *, prefix: str):
         prefixes = await self.bot.pool.fetchval(
             """
-        SELECT prefixes
-            FROM guild_prefixes
-            WHERE guild_id = $1
-        """,
+            SELECT prefixes
+                FROM guild_prefixes
+                WHERE guild_id = $1
+            """,
             ctx.guild.id,
         )
 
@@ -117,10 +117,10 @@ class Prefix(commands.Cog):
             prefixes.remove(prefix)
             await self.bot.pool.execute(
                 """
-            UPDATE guild_prefixes
-                SET prefixes = $1
-                WHERE guild_id = $2
-            """,
+                UPDATE guild_prefixes
+                    SET prefixes = $1
+                    WHERE guild_id = $2
+                """,
                 prefixes,
                 ctx.guild.id,
             )
