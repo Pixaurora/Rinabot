@@ -5,8 +5,6 @@ import textwrap
 
 import random
 
-DICE_REGEX = re.compile(r"^(\d+)d(\d+)$")
-
 
 class Die:
     __slots__ = ("amount", "faces", "name")
@@ -27,7 +25,7 @@ class Die:
     @classmethod
     def from_string(cls, string):
         try:
-            return cls(*[int(i) for i in DICE_REGEX.findall(string)[0]])
+            return cls(*[int(i) for i in re.compile(r"^(\d+)d(\d+)$").findall(string)[0]])
         except IndexError:
             raise KeyError("Incorrect format.")
 
@@ -41,7 +39,7 @@ class RNG(commands.Cog):
 
         name = str(dice_ob)
 
-        message = "Rolling {}".format(name) + " {} times" "".format(repeat)
+        message = f"Rolling __{name}__ {repeat} times"
 
         appendage = "\n".join(
             [
@@ -69,7 +67,7 @@ class RNG(commands.Cog):
             return await ctx.send("You can't doll negative times.")
 
     @commands.group(name="roll", brief="Rolls a dice", invoke_without_command=True)
-    async def roll(self, ctx, *, dice_name: str = None, repeat: int = 1):
+    async def roll(self, ctx, dice_name: str = None, repeat: int = 1):
         """Rolls a Dice
 
         Use the command to see a guide.
