@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 import re
+import textwrap
 
 import random
 
@@ -87,17 +88,21 @@ class RNG(commands.Cog):
         else:
 
             await ctx.send(
-                """**Dice Guide**
-Basic Info
-> *Syntax:* >roll (dice name) (amount of rolls)
-> An amount of rolls is optional and will default to 1.
-> In addition to the premade die avaliable theres also custom die!
-> Enjoy!
-**Premade Dice** 
-> ** **
-**Custom die**
-> To make custom die, simply use this format: (amount)d(sides)
-> Amount just means how many die to use, and sides is the max number you can roll"""
+                textwrap.dedent(
+                    """
+                    __**Dice Guide**__
+                    **Basic Info**
+                    > *Syntax:* >roll (dice name) (amount of rolls)
+                    > An amount of rolls is optional and will default to 1.
+                    > In addition to the premade die avaliable theres also custom die!
+                    > Enjoy!
+                    **Premade Dice** 
+                    > ** **
+                    **Custom die**
+                    > To make custom die, simply use this format: (amount)d(sides)
+                    > Amount just means how many die to use, and sides is the max number you can roll
+                    """
+                )
             )
 
 
