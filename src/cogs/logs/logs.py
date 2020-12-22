@@ -18,13 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from discord.ext import commands
 
-from ..config import GUILD_ID
-from ..config import JOIN_CHANNEL_ID
-from ..config import JOIN_EMOJI
-from ..config import LEAVE_EMOJI
+from ...config import GUILD_ID, JOIN_CHANNEL_ID, JOIN_EMOJI, LEAVE_EMOJI
 
 
-class Log(commands.Cog):
+class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -44,7 +41,3 @@ class Log(commands.Cog):
         channel = self.bot.get_guild(GUILD_ID).get_channel(JOIN_CHANNEL_ID)
 
         await channel.send(f"{LEAVE_EMOJI} Left {guild.name} ({guild.id})")
-
-
-def setup(bot):
-    bot.add_cog(Log(bot))

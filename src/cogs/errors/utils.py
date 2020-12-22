@@ -21,19 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import re
 
-from discord.ext import commands
-
-from .formatting import remove_accents
-
-
-def clean_prefix(bot, prefix):
-    # Replace emoji and mentions with their rendered counterparts
-    # Otherwise users are shown the raw form due to the code block
-
-    prefix = re.sub(r"<a?:(\w{2,32}):\d{15,21}>", ":\\1:", prefix)  # Emoji
-    prefix = re.sub(fr"<@!?{bot.user.id}>", f"@{bot.user}", prefix)  # Mentions
-
-    return remove_accents(prefix)
+from ...utils import clean_prefix
 
 
 def converter_name(converter):

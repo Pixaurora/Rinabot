@@ -24,6 +24,7 @@ import logging
 import discord
 from discord.ext import commands
 
+from .exceptions import BadDieAmount, BadDieName, BadDieSides, BadRepeatInput
 from .formatting import remove_accents
 from .utils import converter_name, get_context
 
@@ -143,3 +144,18 @@ def handle_unexpected_quote_error(ctx, error):
     stop = "" if error.endswith(".") else "."
 
     return f"{error}{stop}".replace("'", "`")
+
+
+@add_handler(BadDieName)
+def handle_bad_die_name(ctx, error):
+    return f"The correct format is [amount]d[sides]. Use {ctx.pretty_prefix()}help "
+
+
+@add_handler(BadDieSides)
+def handle_bad_die_sides(ctx, errors):
+    return "The amount of sides on the die should be a positive, whole integer."
+
+
+@add_handler(BadDieAmount)
+def handle_bad_die_repeat(ctx, errors):
+    return f"The repeat amount must be a positive whole number.{signature}"

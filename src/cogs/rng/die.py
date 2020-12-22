@@ -16,15 +16,34 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import os
+import random
+import re
 
-# Discord bot's API Token
-TOKEN = os.environ["TOKEN"]
+from ..errors import BadDieAmount, BadDieName, BadDieSides
 
-# Discord bot's Server information
-GUILD_ID = os.environ["GUILD_ID"]
-JOIN_CHANNEL_ID = os.environ["JOIN_CHANNEL_ID"]
 
-# Emojis
-JOIN_EMOJI = os.environ["JOIN_EMOJI"]
-LEAVE_EMOJI = os.environ["LEAVE_EMOJI"]
+class Die:
+    __slots__ = ("amount", "faces", "name")
+
+    def __init__(self, name: str):
+        result = re.compile(r"^(\d+)d(\d+)$").findall(name)
+
+        if not result:
+            raise BadDieName
+
+        amount, faces = (int(i) for i in result[0])
+
+        if amount <= 0:
+            raise BadDieAmount
+
+        if faces <= 0:
+            raise BadDieSides
+
+        self.amount = amount
+        self.faces = faces
+
+    def roll(self):
+        return [random.randint(1, self.faces) for i in range(self.amount)]
+
+    def __str__(self):
+        return f"{self.amount}d{self.faces}"

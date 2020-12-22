@@ -18,10 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from discord.ext import commands
 
-from .errors.utils import clean_prefix
+from ...utils import clean_prefix, inline_diff
 
 
-class Prefix(commands.Cog):
+class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -38,6 +38,11 @@ class Prefix(commands.Cog):
 
     @commands.group()
     async def prefix(self, ctx):
+        """Shows the current prefix.
+
+        If you have Administrator permissions you can also use subcommands to change the prefix.
+        """
+
         if ctx.invoked_subcommand:
             return
 
@@ -54,6 +59,8 @@ class Prefix(commands.Cog):
     @prefix.command()
     @commands.has_guild_permissions(administrator=True)
     async def add(self, ctx, *, prefix: str):
+        """Adds a prefix to the guild for this bot."""
+
         if clean_prefix(self.bot, prefix) in await self.get_pretty_prefixes(
             ctx.message
         ):
@@ -94,6 +101,8 @@ class Prefix(commands.Cog):
     @prefix.command()
     @commands.has_guild_permissions(administrator=True)
     async def remove(self, ctx, *, prefix: str):
+        """Removes a prefix from this guild for the bot."""
+
         prefixes = await self.bot.pool.fetchval(
             """
             SELECT prefixes
@@ -128,6 +137,7 @@ class Prefix(commands.Cog):
                 f"The prefix `{clean_prefix(self.bot, prefix)}` has been successfully removed!"
             )
 
-
-def setup(bot):
-    bot.add_cog(Prefix(bot))
+    @commands.command(usage='"[before]" "[after]"')
+    async def diff(self, ctx, before: str, after: str):
+        """Take the diff of two strings."""
+        await ctx.send(inline_diff(before, after))

@@ -27,6 +27,7 @@ from discord.ext import commands
 from .config import TOKEN
 from .context import Context
 
+
 async def get_prefix(bot, message):
     default_prefix = [f"<@{bot.user.id}> ", f"<@!{bot.user.id}> "]
     if not message.guild:
@@ -45,6 +46,7 @@ async def get_prefix(bot, message):
     else:
         return default_prefix + prefixes
 
+
 class RinaBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents(
@@ -61,10 +63,10 @@ class RinaBot(commands.Bot):
 
         extensions = [
             "jishaku",
-            "src.cogs.prefix",
+            "src.cogs.misc",
             "src.cogs.errors",
             "src.cogs.rng",
-            "src.cogs.log",
+            "src.cogs.logs",
         ]
 
         for cog in extensions:
@@ -95,14 +97,13 @@ class RinaBot(commands.Bot):
         ctx = await self.get_context(message, cls=Context)
         await self.invoke(ctx)
 
-
     async def handle_guild(self, guild):
         await self.pool.execute(
             """
             INSERT INTO guilds (id)
                 VALUES ($1)
             ON CONFLICT (id)
-                DO NOTHING;
+                DO NOTHING
             """,
             guild.id,
         )
@@ -119,5 +120,10 @@ class RinaBot(commands.Bot):
             except asyncpg.exceptions.CannotConnectNowError:
                 await asyncio.sleep(1)
 
-        async with aiohttp.ClientSession(loop=self.loop, headers={'User-Agent': 'Rina Bot/0.1a (+https://github.com/araRina/Rina-Bot)'}) as self.session:
+        async with aiohttp.ClientSession(
+            loop=self.loop,
+            headers={
+                "User-Agent": "Rina Bot/0.1a (+https://github.com/araRina/Rina-Bot)"
+            },
+        ) as self.session:
             await super().start(*args, **kwargs)
