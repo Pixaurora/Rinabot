@@ -16,6 +16,7 @@ services:
   bot:
     volumes:
       - ./src:/src
+    restart: always
     networks:
       rina-bot:
     env_file: .env
