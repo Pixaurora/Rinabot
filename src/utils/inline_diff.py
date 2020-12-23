@@ -19,15 +19,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import difflib
 import re
 
-
 _differ = difflib.Differ()
 
-_MARKDOWN_ESCAPE_COMMON = r'^>(?:>>)?\s|\[.+\]\(.+\)'
+_MARKDOWN_ESCAPE_COMMON = r"^>(?:>>)?\s|\[.+\]\(.+\)"
 
-_MARKDOWN_ESCAPE_SUBREGEX = '|'.join(r'\{0}(?=([\s\S]*(\{0}?\{0}?)))'.format(c)
-                                     for c in ('*', '`', '_', '~', '|'))
+_MARKDOWN_ESCAPE_SUBREGEX = "|".join(
+    r"\{0}(?=([\s\S]*(\{0}?\{0}?)))".format(c) for c in ("*", "`", "_", "~", "|")
+)
 
-_URL_REGEX = r"""(<)?(?P<url>(?:https?|steam):\/\/[^\s<]+[^<.,:;"'\]\s])(?(1)(?=(>))|)"""
+_URL_REGEX = (
+    r"""(<)?(?P<url>(?:https?|steam):\/\/[^\s<]+[^<.,:;"'\]\s])(?(1)(?=(>))|)"""
+)
 
 _MENTION_REGEX = (
     r"""(<#[0-9]+>|<@!?[0-9]+>|<a?:[\w\d]+:[0-9]+>|<@&[0-9]+>|%s)""" % _URL_REGEX
@@ -38,20 +40,23 @@ _DIFF_STRING = """
 **a:** {after}
 """
 
-_MARKDOWN_ESCAPE_REGEX = re.compile(r'(?P<markdown>%s|%s)' % (_MARKDOWN_ESCAPE_SUBREGEX, _MARKDOWN_ESCAPE_COMMON), re.MULTILINE)
+_MARKDOWN_ESCAPE_REGEX = re.compile(
+    r"(?P<markdown>%s|%s)" % (_MARKDOWN_ESCAPE_SUBREGEX, _MARKDOWN_ESCAPE_COMMON),
+    re.MULTILINE,
+)
+
 
 def prepare_text(text):
-    text = re.sub(r'\\', r'\\\\', text)
-    text = _MARKDOWN_ESCAPE_REGEX.sub(r'\\\1', text)
+    text = re.sub(r"\\", r"\\\\", text)
+    text = _MARKDOWN_ESCAPE_REGEX.sub(r"\\\1", text)
 
-    return '\\'.join(re.sub(_URL_REGEX, r'<\g<url>>', section) for section in  text.split('\\'))
+    return "\\".join(
+        re.sub(_URL_REGEX, r"<\g<url>>", section) for section in text.split("\\")
+    )
 
 
 def inline_diff(before, after):
-    before, after = (
-        list(prepare_text(text))
-        for text in (before, after)
-    )
+    before, after = (list(prepare_text(text)) for text in (before, after))
 
     diff = list(_differ.compare(before, after))
 
@@ -70,16 +75,13 @@ def inline_diff(before, after):
             after_deltas[span[0] : span[1]] = ["+"] * (span[1] - span[0])
 
     for match in re.finditer(r"([-]+)", "".join(before_deltas)):
-        before[match.start():match.end()] = ['~~'] + before[match.start():match.end()] + ['~~']
+        before[match.start() : match.end()] = (
+            ["~~"] + before[match.start() : match.end()] + ["~~"]
+        )
 
     for match in re.finditer(r"([+]+)", "".join(after_deltas)):
-        after[match.start():match.end()] = ['**'] + after[match.start():match.end()] + ['**']
+        after[match.start() : match.end()] = (
+            ["**"] + after[match.start() : match.end()] + ["**"]
+        )
 
     return _DIFF_STRING.format(before="".join(before), after="".join(after))
-
-print(
-    inline_diff(
-        '**hello**https://snowyluma.dev/',
-        '**hello https://snowyluma.dev/**'
-    )
-)
