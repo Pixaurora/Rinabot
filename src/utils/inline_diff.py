@@ -17,95 +17,69 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import difflib
-import inspect
 import re
 
-from discord import utils
 
 _differ = difflib.Differ()
 
-_LINK_REGEX = r"""((?:https?|steam):\/\/[^\s<]+[^<.,:;"'\]\s])"""
+_MARKDOWN_ESCAPE_COMMON = r'^>(?:>>)?\s|\[.+\]\(.+\)'
 
-_MENTION_REGEX = r"""^(<#[0-9]+>|<@!?[0-9]+>|<a?:[\w\d]+:[0-9]+>|<@&[0-9]+>|<(?:(?:https?|steam):\/\/[^\s<]+[^<.,:;"'\]\s])>)"""
+_MARKDOWN_ESCAPE_SUBREGEX = '|'.join(r'\{0}(?=([\s\S]*(\{0}?\{0}?)))'.format(c)
+                                     for c in ('*', '`', '_', '~', '|'))
 
+_URL_REGEX = r"""(<)?(?P<url>(?:https?|steam):\/\/[^\s<]+[^<.,:;"'\]\s])(?(1)(?=(>))|)"""
 
-def check_for_mentions(text):
-    return re.findall(_MENTION_REGEX, text)
+_MENTION_REGEX = (
+    r"""(<#[0-9]+>|<@!?[0-9]+>|<a?:[\w\d]+:[0-9]+>|<@&[0-9]+>|%s)""" % _URL_REGEX
+)
+
+_DIFF_STRING = """
+**b:** {before}
+**a:** {after}
+"""
+
+_MARKDOWN_ESCAPE_REGEX = re.compile(r'(?P<markdown>%s|%s)' % (_MARKDOWN_ESCAPE_SUBREGEX, _MARKDOWN_ESCAPE_COMMON), re.MULTILINE)
+
+def prepare_text(text):
+    text = re.sub(r'\\', r'\\\\', text)
+    text = _MARKDOWN_ESCAPE_REGEX.sub(r'\\\1', text)
+
+    return '\\'.join(re.sub(_URL_REGEX, r'<\g<url>>', section) for section in  text.split('\\'))
 
 
 def inline_diff(before, after):
     before, after = (
-        re.sub(_LINK_REGEX, r"<\1>", utils.escape_markdown(text))
+        list(prepare_text(text))
         for text in (before, after)
     )
 
     diff = list(_differ.compare(before, after))
 
-    deltas = [i[0] for i in diff]
-    last_deltas = [""] + deltas[:-1]
-    next_deltas = deltas[1:] + [""]
-    characters = [i[2] for i in diff]
+    before_deltas, after_deltas = (
+        [i[0] for i in diff if i[0] != delta] for delta in ["+", "-"]
+    )
 
-    allow_format_change = True
-    override_before_delta = False
-    override_after_delta = False
-    end_of_mention = 0
+    for match in re.finditer(_MENTION_REGEX, "".join(before)):
+        span = match.span(0)
+        if "-" in before_deltas[span[0] : span[1]]:
+            before_deltas[span[0] : span[1]] = ["-"] * (span[1] - span[0])
 
-    before_output = ""
-    after_output = ""
+    for match in re.finditer(_MENTION_REGEX, "".join(after)):
+        span = match.span(0)
+        if "+" in after_deltas[span[0] : span[1]]:
+            after_deltas[span[0] : span[1]] = ["+"] * (span[1] - span[0])
 
-    for i, last_delta, delta, next_delta, character in zip(
-        range(len(diff)), last_deltas, deltas, next_deltas, characters
-    ):
-        if character == "<":
-            possible_mention = re.findall(_MENTION_REGEX, "".join(characters[i:]))
+    for match in re.finditer(r"([-]+)", "".join(before_deltas)):
+        before[match.start():match.end()] = ['~~'] + before[match.start():match.end()] + ['~~']
 
-            print(possible_mention)
+    for match in re.finditer(r"([+]+)", "".join(after_deltas)):
+        after[match.start():match.end()] = ['**'] + after[match.start():match.end()] + ['**']
 
-            if possible_mention:
-                end_of_mention = i + len(possible_mention[0]) - 1
-                allow_format_change = False
+    return _DIFF_STRING.format(before="".join(before), after="".join(after))
 
-                override_before_delta = "-" in deltas[i:end_of_mention]
-                override_after_delta = "+" in deltas[i:end_of_mention]
-
-                if override_before_delta:
-                    before_output += "~~"
-                if override_after_delta:
-                    after_output += "**"
-
-        if delta != "+":
-            if delta == "-" and delta != last_delta and allow_format_change:
-                before_output += "~~"
-            before_output += character
-            if i == end_of_mention:
-                allow_format_change = True
-            if (
-                delta == "-"
-                and delta != next_delta
-                and allow_format_change
-                or allow_format_change
-                and override_before_delta
-            ):
-                before_output += "~~"
-                override_before_delta = False
-        if delta != "-":
-            if delta == "+" and delta != last_delta and allow_format_change:
-                after_output += "**"
-            after_output += character
-            if (
-                delta == "+"
-                and delta != next_delta
-                and allow_format_change
-                or allow_format_change
-                and override_after_delta
-            ):
-                after_output += "**"
-                override_after_delta = False
-
-    return inspect.cleandoc(
-        """
-        **b:** {before}
-        **a:** {after}
-        """
-    ).format(before=before_output, after=after_output)
+print(
+    inline_diff(
+        '**hello**https://snowyluma.dev/',
+        '**hello https://snowyluma.dev/**'
+    )
+)

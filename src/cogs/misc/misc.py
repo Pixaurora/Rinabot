@@ -138,6 +138,6 @@ class Misc(commands.Cog):
             )
 
     @commands.command(usage='"[before]" "[after]"')
-    async def diff(self, ctx, before: str, after: str):
+    async def diff(self, ctx, before: str, *, after: str):
         """Take the diff of two strings."""
         await ctx.send(inline_diff(before, after))
