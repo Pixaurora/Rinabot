@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from discord.ext import commands
 
-from ...config import GUILD_ID, JOIN_CHANNEL_ID, JOIN_EMOJI, LEAVE_EMOJI
+from ...config import JOIN_CHANNEL_ID, JOIN_EMOJI, LEAVE_EMOJI
 
 
 class Logs(commands.Cog):
@@ -27,7 +27,7 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        channel = self.bot.get_guild(GUILD_ID).get_channel(JOIN_CHANNEL_ID)
+        channel = self.bot.get_channel(JOIN_CHANNEL_ID)
 
         bots = sum(member.bot for member in guild.members)
         humans = len(guild.members) - bots
@@ -38,6 +38,6 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        channel = self.bot.get_guild(GUILD_ID).get_channel(JOIN_CHANNEL_ID)
+        channel = self.bot.get_channel(JOIN_CHANNEL_ID)
 
         await channel.send(f"{LEAVE_EMOJI} Left {guild.name} ({guild.id})")

@@ -22,8 +22,7 @@ import os
 TOKEN = os.environ["TOKEN"]
 
 # Discord bot's Server information
-GUILD_ID = os.environ["GUILD_ID"]
-JOIN_CHANNEL_ID = os.environ["JOIN_CHANNEL_ID"]
+JOIN_CHANNEL_ID = int(os.environ["JOIN_CHANNEL_ID"])
 
 # Emojis
 JOIN_EMOJI = os.environ["JOIN_EMOJI"]
